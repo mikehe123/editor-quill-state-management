@@ -4,6 +4,7 @@ import { atom, atomFamily} from "recoil";
 export const argumentsAtomFamily = atomFamily({
   key: 'argumentsAtomFamily',
   default: {
+    cursorAt: 0,
       content: null
   },
 });

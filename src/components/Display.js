@@ -1,19 +1,20 @@
 import { useRecoilValue } from "recoil"
 import { argumentIds, argumentsAtomFamily } from "../utils/atoms"
 
-const BoardItem= (id) =>{
-const  argumentContent =    useRecoilValue(argumentsAtomFamily(id))
-
+const BoardItem= ({id}) =>{
+const  argumentContent =  useRecoilValue(argumentsAtomFamily(id))
+console.log(argumentContent)
 return (
-    <>{argumentContent}</>
+    // <div>{argumentContent.content}</div>
+    <div></div>
 )
 }
 
 const Board = () =>{
     const allArgids = useRecoilValue(argumentIds)
-
+    console.log(allArgids)
     return <>{allArgids.map((id) =>{
-<BoardItem key={id} id={id}/>
+        return<BoardItem key={id} id={id}/>
     })}</>
 }
 

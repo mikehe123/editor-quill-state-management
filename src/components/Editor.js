@@ -1,27 +1,56 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuill } from "react-quilljs";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import 'quill/dist/quill.bubble.css'; 
 import { argumentIds, argumentsAtomFamily } from "../utils/atoms";
 import quillConfig from "./quillConfigure";
-import useKeyPress from "./onTab";
 
 const QuillEditor = ({argid}) => {
   const { quill, quillRef } = useQuill(quillConfig);
   const [argument, setArgument] = useRecoilState(argumentsAtomFamily(argid))
-  const isTabPressed = useKeyPress({ key: "Tab" })
-  console.log(isTabPressed)     
-  useEffect(() => {
+const setArgId = useSetRecoilState(argumentIds)
+ const [isUp, setIsUp] = useState(false)
+  
+
+   useEffect(() => {
+     let argCursorAt; 
+     let argContentBlock;
     if (quill) {
-      quill.on('text-change', (delta, oldDelta, source) => {
-        console.log('Text change!');
-        console.log(quill.getText()); // Get text only
-        console.log(quill.getContents()); // Get delta contents
-        console.log(quill.root.innerHTML); // Get innerHTML using quill
-        console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef
-      });
+      quill.on('text-change', onTextChangeHOF(quill, argCursorAt, argContentBlock));
+      
     }
-  }, [quill]);
+    console.log(argContentBlock)
+    setArgument({
+      cursorAt: argCursorAt,
+      content: argContentBlock
+    })
+    
+    const handleUp = event => {
+      
+      if (9 === event.keyCode) {
+        if(quill){
+        quill.off('text-change', onTextChangeHOF(quill, argCursorAt,argContentBlock))
+        quill.setContents("")
+        }
+         setArgId((oldIds) => [...oldIds, oldIds[oldIds.length - 1] + 1]);
+        setIsUp(true)
+      }else{
+        setIsUp(false)
+      }
+    }
+    window.addEventListener("keyup", handleUp)
+    
+    return () => {
+      if(quill){
+      // quill.off('text-change', onTextChangeHOF)
+      // quill.setContents("")
+    }
+      window.removeEventListener("keyup", handleUp)
+      
+    }
+  }, [quill])
+
+  console.log(isUp)
 
   return (
     <div style={{ width: 500, height: 300 }}>
@@ -30,11 +59,21 @@ const QuillEditor = ({argid}) => {
   );
 };
 
+function onTextChangeHOF(quill, argCursorAt, argContentBlock) {
+  return function onTextChange() {
+    // console.log(quill)
+             argCursorAt = quill.getSelection().index;
+            argContentBlock = quill.getLines(argCursorAt);
+            console.log("inside HOF")
+            console.log(argContentBlock)
+  }
+ }
+
 const QuillEditorContainer = () => {
     const argid = useRecoilValue(argumentIds)
-
+    let lastId = argid[argid.length-1]
     return(
-        <QuillEditor argid={argid}/>
+        <QuillEditor argid={lastId}/>
     )
 }
 
