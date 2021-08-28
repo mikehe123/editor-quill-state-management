@@ -1,16 +1,15 @@
-import { atom, atomFamily} from "recoil";
-
+import { atom, atomFamily } from "recoil";
 
 export const argumentsAtomFamily = atomFamily({
-  key: 'argumentsAtomFamily',
+  key: "argumentsAtomFamily",
   default: {
     cursorAt: 0,
-      content: null
+    content: [],
+    selected: "",
   },
 });
 
 export const argumentIds = atom({
-  key:"argumentIds",
-  default:[0]
-})
-
+  key: "argumentIds",
+  default: [0],
+});
